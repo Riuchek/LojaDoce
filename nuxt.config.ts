@@ -4,11 +4,11 @@ export default defineNuxtConfig({
   modules: ['@nuxtjs/device'],
   app: {
     head: {
-      title: 'Loja Doce',
+      title: 'Delicias de Minas',
       meta: [
         { charset: 'utf-8' },
         { name: 'viewport', content: 'width=device-width, initial-scale=1' },
-        { name: 'description', content: 'Loja Doce - Sua loja de doces' }
+        { name: 'description', content: 'Delicias de Minas - Sua loja de doces' }
       ],
       link: [
         { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }
