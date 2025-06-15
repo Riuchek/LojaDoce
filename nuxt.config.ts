@@ -1,14 +1,15 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   devtools: { enabled: true },
-  modules: [],
+  modules: ['@nuxtjs/device', '@nuxtjs/tailwindcss'],
+  css: ['~/assets/css/main.css'],
   app: {
     head: {
-      title: 'Loja Doce',
+      title: 'Delicias de Minas',
       meta: [
         { charset: 'utf-8' },
         { name: 'viewport', content: 'width=device-width, initial-scale=1' },
-        { name: 'description', content: 'Loja Doce - Sua loja de doces' }
+        { name: 'description', content: 'Delicias de Minas - Sua loja de doces' }
       ],
       link: [
         { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }
