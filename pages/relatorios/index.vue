@@ -4,7 +4,10 @@ interface Relatorio {
     id: number
     isPaid: boolean
     name: string
+    address: string
+    tel: string
     value: number
+    order_number: string
 }
 
 const relatorios = ref<Relatorio[]>([])
@@ -17,7 +20,10 @@ onMounted(async () => {
 const newRelatorio = ref({
     name: '',
     isPaid: false,
-    value: 0
+    value: 0,
+    address: '',
+    tel: '',
+    order_number: ''
 })
 
 async function addRelatorio() {
@@ -29,7 +35,10 @@ async function addRelatorio() {
             body: {
                 name: newRelatorio.value.name,
                 isPaid: newRelatorio.value.isPaid,
-                value: newRelatorio.value.value
+                value: newRelatorio.value.value,
+                address: newRelatorio.value.address,
+                tel: newRelatorio.value.tel,
+                order_number: newRelatorio.value.order_number
             }
         });
         
@@ -37,6 +46,9 @@ async function addRelatorio() {
         newRelatorio.value.name = '';
         newRelatorio.value.isPaid = false;
         newRelatorio.value.value = 0;
+        newRelatorio.value.address = '';
+        newRelatorio.value.tel = '';
+        newRelatorio.value.order_number = '';
     } catch (error) {
         console.error('Error saving relatório:', error);
     }
@@ -81,8 +93,12 @@ async function exportToPDF() {
         
         // Add table
         autoTable(doc, {
-            head: [['Nome do Relatório', 'Valor', 'Status']],
+            head: [['Numero', 'Pedido', 'Telefone', 'Endereço', 'Cliente', 'Valor', 'Status']],
             body: relatorios.value.map(relatorio => [
+                relatorio.id,
+                relatorio.order_number,
+                relatorio.tel,
+                relatorio.address,
                 relatorio.name,
                 `R$ ${relatorio.value.toFixed(2)}`,
                 relatorio.isPaid ? 'Pago' : 'Não pago'
@@ -94,7 +110,7 @@ async function exportToPDF() {
                 cellPadding: 5,
             },
             headStyles: {
-                fillColor: [41, 128, 185],
+                fillColor: [46, 204, 113],
                 textColor: 255,
                 fontSize: 12,
                 fontStyle: 'bold',
@@ -113,19 +129,22 @@ async function exportToPDF() {
     <div class="relatorios-container">
         <div class="header-actions">
             <h1 class="text-2xl font-bold text-center mb-6">Relatorios</h1>
-            <button @click="exportToPDF" class="export-btn">
-                Exportar PDF
-            </button>
         </div>
         <div class="excel-sheet">
             <div class="sheet-header">
-                <div class="header-cell">Nome do Relatório</div>
-                <div class="header-cell">Valor</div>
-                <div class="header-cell">Status</div>
+                <div class="header-cell">Telefone</div>
+                <div class="header-cell">Cliente</div>
+                <div class="header-cell">Endereço</div>
+                <div class="header-cell">Pedido</div>
+                <div class="header-cell">Valor total</div>
+                <div class="header-cell">Situação</div>
             </div>
             <div class="sheet-body">
                 <div v-for="relatorio in relatorios" :key="relatorio.id" class="sheet-row">
+                    <div class="sheet-cell">{{ relatorio.tel }}</div>
                     <div class="sheet-cell">{{ relatorio.name }}</div>
+                    <div class="sheet-cell">{{ relatorio.address }}</div>
+                    <div class="sheet-cell">{{ relatorio.order_number }}</div>
                     <div class="sheet-cell">{{ relatorio.value }}</div>
                     <div class="sheet-cell">
                         <button 
@@ -149,14 +168,31 @@ async function exportToPDF() {
             <input
                 v-model="newRelatorio.name"
                 type="text"
-                placeholder="Nome do Relatório"
+                placeholder="Cliente"
                 class="input"
                 required
             />
-            <select v-model="newRelatorio.isPaid" class="input">
-                <option :value="true">Pago</option>
-                <option :value="false">Não pago</option>
-            </select>
+            <input
+                v-model="newRelatorio.tel"
+                type="tel"
+                placeholder="Telefone"
+                class="input"
+                required
+            />
+            <input
+                v-model="newRelatorio.address"
+                type="text"
+                placeholder="Endereço"
+                class="input"
+                required
+            />
+            <input
+                v-model="newRelatorio.order_number"
+                type="text"
+                placeholder="Pedido"
+                class="input"
+                required
+            />
             <input
                 v-model="newRelatorio.value"
                 type="number"
@@ -164,7 +200,14 @@ async function exportToPDF() {
                 class="input"
                 required
             />
+            <select v-model="newRelatorio.isPaid" class="input">
+                <option :value="true">Pago</option>
+                <option :value="false">Não pago</option>
+            </select>
             <button type="submit" class="add-btn">Adicionar</button>
+            <button @click="exportToPDF" class="export-btn">
+                Exportar PDF
+            </button>
         </form>
     </div>
 </template>
@@ -181,7 +224,7 @@ async function exportToPDF() {
 
 .excel-sheet {
     width: 100%;
-    max-width: 800px;
+    max-width: 1200px;
     background-color: white;
     border-radius: 8px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
@@ -190,17 +233,20 @@ async function exportToPDF() {
 
 .sheet-header {
     display: grid;
-    grid-template-columns: 2fr 1fr 1fr;
-    background-color: #f1f3f4;
+    grid-template-columns: 1fr 1.5fr 2fr 1fr 1fr 1.5fr;
+    background-color: #4CAF50;
     border-bottom: 2px solid #e0e0e0;
 }
 
 .header-cell {
     padding: 1rem;
     font-weight: 600;
-    color: #1f2937;
+    color: white;
     text-align: left;
-    border-right: 1px solid #e0e0e0;
+    border-right: 1px solid rgba(255, 255, 255, 0.2);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .header-cell:last-child {
@@ -214,7 +260,7 @@ async function exportToPDF() {
 
 .sheet-row {
     display: grid;
-    grid-template-columns: 2fr 1fr 1fr;
+    grid-template-columns: 1fr 1.5fr 2fr 1fr 1fr 1.5fr;
     border-bottom: 1px solid #e0e0e0;
     transition: background-color 0.2s ease;
 }
@@ -233,6 +279,9 @@ async function exportToPDF() {
     align-items: center;
     border-right: 1px solid #e0e0e0;
     min-height: 60px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .sheet-cell:last-child {
@@ -277,7 +326,7 @@ async function exportToPDF() {
     align-items: center;
     flex-wrap: wrap;
     width: 100%;
-    max-width: 800px;
+    max-width: 1200px;
 }
 
 .input {
@@ -296,7 +345,7 @@ async function exportToPDF() {
 
 .add-btn {
     padding: 0.5rem 1.5rem;
-    background-color: #1976d2;
+    background-color: #4CAF50;
     color: white;
     border: none;
     border-radius: 4px;
@@ -307,7 +356,7 @@ async function exportToPDF() {
 }
 
 .add-btn:hover {
-    background-color: #1565c0;
+    background-color: #43A047;
 }
 
 .delete-btn {
@@ -334,7 +383,7 @@ async function exportToPDF() {
 
 .export-btn {
     padding: 0.5rem 1.5rem;
-    background-color: #2ecc71;
+    background-color: #4CAF50;
     color: white;
     border: none;
     border-radius: 4px;
@@ -344,6 +393,6 @@ async function exportToPDF() {
 }
 
 .export-btn:hover {
-    background-color: #27ae60;
+    background-color: #43A047;
 }
 </style>
