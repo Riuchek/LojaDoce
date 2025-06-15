@@ -67,16 +67,61 @@ async function toggleIsPaid(relatorio: Relatorio) {
         console.error('Error updating relatório status:', error);
     }
 }
+
+async function exportToPDF() {
+    try {
+        const { jsPDF } = await import('jspdf')
+        const { default: autoTable } = await import('jspdf-autotable')
+        
+        const doc = new jsPDF()
+        
+        // Add title
+        doc.setFontSize(16)
+        doc.text('Relatórios', 14, 15)
+        
+        // Add table
+        autoTable(doc, {
+            head: [['Nome do Relatório', 'Valor', 'Status']],
+            body: relatorios.value.map(relatorio => [
+                relatorio.name,
+                `R$ ${relatorio.value.toFixed(2)}`,
+                relatorio.isPaid ? 'Pago' : 'Não pago'
+            ]),
+            startY: 25,
+            theme: 'grid',
+            styles: {
+                fontSize: 10,
+                cellPadding: 5,
+            },
+            headStyles: {
+                fillColor: [41, 128, 185],
+                textColor: 255,
+                fontSize: 12,
+                fontStyle: 'bold',
+            },
+        })
+        
+        // Save the PDF
+        doc.save('relatorios.pdf')
+    } catch (error) {
+        console.error('Error generating PDF:', error)
+    }
+}
 </script>
 
 <template>
     <div class="relatorios-container">
-        <h1 class="text-2xl font-bold text-center mb-6">Relatorios</h1>
+        <div class="header-actions">
+            <h1 class="text-2xl font-bold text-center mb-6">Relatorios</h1>
+            <button @click="exportToPDF" class="export-btn">
+                Exportar PDF
+            </button>
+        </div>
         <div class="excel-sheet">
             <div class="sheet-header">
                 <div class="header-cell">Nome do Relatório</div>
-                <div class="header-cell">Status</div>
                 <div class="header-cell">Valor</div>
+                <div class="header-cell">Status</div>
             </div>
             <div class="sheet-body">
                 <div v-for="relatorio in relatorios" :key="relatorio.id" class="sheet-row">
@@ -278,5 +323,27 @@ async function toggleIsPaid(relatorio: Relatorio) {
 
 .delete-btn:hover {
     background-color: #c82333;
+}
+
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.export-btn {
+    padding: 0.5rem 1.5rem;
+    background-color: #2ecc71;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.export-btn:hover {
+    background-color: #27ae60;
 }
 </style>
