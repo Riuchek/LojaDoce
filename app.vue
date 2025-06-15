@@ -5,7 +5,9 @@ const layout = computed(() => isMobile ? 'mobile' : 'desktop')
 </script>
 <template>
   <div>
-    <NuxtLayout :name="layout" />
+    <NuxtLayout :name="layout">
+      <NuxtPage />
+    </NuxtLayout>
   </div>
 </template>
 

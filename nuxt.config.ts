@@ -1,7 +1,8 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   devtools: { enabled: true },
-  modules: ['@nuxtjs/device'],
+  modules: ['@nuxtjs/device', '@nuxtjs/tailwindcss'],
+  css: ['~/assets/css/main.css'],
   app: {
     head: {
       title: 'Delicias de Minas',
